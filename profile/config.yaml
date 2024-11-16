@@ -1,0 +1,33 @@
+default-resources:
+  - disk=1024
+  - mem_mb=16384
+  - hrs=2
+#  - hrs=48 temporarily changed for maintenance window
+cluster:
+  mkdir -p logs/{rule} &&
+  sbatch
+    --account=hsiehph
+    --partition=sioux,msismall
+    --nodes=1
+    --ntasks-per-node=1
+    --cpus-per-task={resources.threads}
+    --mem={resources.mem_mb}M
+    --tmp={resources.disk}M
+    --time={resources.hrs}:00:00
+    --job-name={rule}-{wildcards}
+    --output=logs/{rule}/{rule}_{wildcards}.%j.out
+    --export=all
+    --parsable # Required to pass job IDs to scancel
+jobs: 100
+rerun-incomplete: True
+cluster-cancel: scancel
+cluster-cancel-nargs: 500 # cancel 500 jobs at a time, all will still be canceled
+printshellcmds: True
+reason: True
+show-failed-logs: True 
+latency-wait: 60
+cluster-status: status-sacct.sh
+use-conda: True
+max-jobs-per-second: 200
+#rerun-triggers: mtime 
+#restart-times: 1

@@ -1,0 +1,19 @@
+name: cpg
+channels:
+  - bioconda
+  - conda-forge
+  - epi2melabs
+  - defaults
+dependencies:
+  - python=3.9
+  - tensorflow=2.7
+  - numpy=1.20.0
+  - biopython
+  - pandas
+  - pysam
+  - tqdm
+  - pybigwig
+  - samtools>=1.12
+  - modbam2bed
+  - minimap2=2.24
+
