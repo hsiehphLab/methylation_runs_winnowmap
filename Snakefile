@@ -102,7 +102,7 @@ rule extract_haps:
 	shell:
 		'''
 		awk -v OFS="\\t" '{{print $1}}' {input.read_loc} > {output.just_names}
-		awk -v OFS="\\t" '{{print $2}}' {input.read_loc} | sort -u | xargs -i samtools view -b -o {output.bam} -N {output.just_names} {{}}
+		module load samtools/1.20 && awk -v OFS="\\t" '{{print $2}}' {input.read_loc} | sort -u | xargs -i samtools view -b -o {output.bam} -N {output.just_names} {{}}
 		'''
 #GENERATE FASTQ FILES FROM BAM FILES WITH METHYLATED DATA
 def getBAM(wildcards):
@@ -139,7 +139,7 @@ rule copy_ref:
 	shell:
 		'''
 		cp {input.ref} {output.cp_ref}
-		samtools faidx {output.cp_ref}
+		module load samtools/1.20 && samtools faidx {output.cp_ref}
 		'''
 #ALIGN SAMPLE METHYLATED FASTQ FILE TO REF
 rule align_to_ref:
@@ -149,7 +149,7 @@ rule align_to_ref:
 	output:
 		bam = 'results/{sample}/alignments/{tech}_{hap}_{name}_to_ref.bam'
 	resources:
-		mem_mb = 50000,
+		mem_mb = 25000,
 		hrs = 24,
 		threads = 16
 	params:
@@ -179,8 +179,8 @@ rule combine_bams:
 		"cpg2"
 	shell:
 		'''
-		samtools merge -@{threads} -o {output.combined_bam} {input.bams}
-		samtools index {output.combined_bam}
+		module load samtools/1.20 && samtools merge -@{threads} -o {output.combined_bam} {input.bams}
+		module load samtools/1.20 && samtools index {output.combined_bam}
 		'''
 #CONVERT BAM FILE TO METHYL BED FILE
 
