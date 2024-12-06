@@ -149,21 +149,42 @@ rule align_to_ref:
 	output:
 		bam = 'results/{sample}/alignments/{tech}_{hap}_{name}_to_ref.bam'
 	resources:
-		mem_mb = 25000,
+		mem_mb = 45000,
 		hrs = 24,
-		threads = 16
+		threads = 4
 	params:
 		sort_t = 2,
 		tech = lambda wildcards: tech_dict[manifest_df.at[wildcards.sample,'tech_type']]
 	# Without this, it doesn't work.  I think it allows the inherited snakemake_plus environment to be used
 	# conda:
 	# 	"envs/cpg.yaml"
-	shell:
-		'''
-		meryl count k=15 output merylDB {input.ref} 
-		mkdir -p rep_k15 && meryl print greater-than distinct=0.9998 merylDB > rep_k15/{wildcards.sample}_repetitive_k15.txt
-		module load samtools/1.20 && winnowmap -W {wildcards.sample}_repetitive_k15.txt -y --eqx -ax {params.tech} -s 4000 -t 16 -I 10g {input.ref} {input.fastq} | samtools view -u -F 2308 - | samtools sort -o {output.bam} -
-		'''
+	run:
+		szMakeJobUnique = str( wildcards.sample ) + "_" + str( wildcards.tech ) + "_" + str( wildcards.hap ) + "_" + str( wildcards.name )
+		szCommand = f"meryl count k=15 output {szMakeJobUnique}.meryl {input.ref}"
+		print( f"about to execute: {szCommand}")
+		shell( szCommand )
+
+		szCommand = f"mkdir -p rep_k15 && meryl print greater-than distinct=0.9998 {szMakeJobUnique}.meryl > rep_k15/{szMakeJobUnique}_repetitive_k15.txt"
+		print( f"about to execute: {szCommand}")
+		shell( szCommand )
+
+		szCommand = f"module load samtools/1.20 && winnowmap -W {szMakeJobUnique}_repetitive_k15.txt -y --eqx -ax {params.tech} -s 4000 -t 16 -I 10g {input.ref} {input.fastq} >{output.bam}.tmp"
+		print( f"about to execute: {szCommand}")
+		shell( szCommand )
+
+		szCommand = f"module load samtools/1.20 && cat {output.bam}.tmp | samtools view -u -F 2308 - >{output.bam}.tmp2"
+		print( f"about to execute: {szCommand}")
+		shell( szCommand )
+
+		szCommand = f"module load samtools/1.20 && cat {output.bam}.tmp2 | samtools sort -o {output.bam} -"
+		print( f"about to execute: {szCommand}")
+		shell( szCommand )
+
+		szCommand = f"rm -rf {szMakeJobUnique}.meryl {output.bam}.tmp {output.bam}.tmp2"
+		print( f"about to execute: {szCommand}")
+		shell( szCommand )
+
+
 #COMBINE BAMS OF SAMPLE ALIGNED TO REF
 rule combine_bams:
 	input:
