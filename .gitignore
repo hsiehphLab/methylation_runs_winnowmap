@@ -1,0 +1,8 @@
+all_bams.fofn
+rep_k15
+results
+slurm*.out
+.snakemake
+data
+logs
+sacct.log
