@@ -1,2 +1,2 @@
 sample	hap1_fasta	hap2_fasta	bam_fofn	fastq_fofn	unphased	tech_type	asm
-does_sample_name_matter	NA	NA	test_bam.fofn	NA	True	hifi	/home/hsiehph/gordo893/samples/PNG15b/verkko1.4.1/PNG15_ONT_HIC/PNG15_both_haps_again.fa.gz
+PNG15	NA	NA	all_bams.fofn	NA	True	ont	/home/hsiehph/gordo893/samples/PNG15b/verkko1.4.1/PNG15_ONT_HIC/PNG15_both_haps_again.fa.gz

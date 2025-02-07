@@ -1,8 +1,7 @@
 default-resources:
   - disk=1024
   - mem_mb=16384
-  - hrs=2
-#  - hrs=48 temporarily changed for maintenance window
+  - hrs=48
 cluster:
   mkdir -p logs/{rule} &&
   sbatch
